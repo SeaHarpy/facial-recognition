@@ -1,10 +1,9 @@
-# Facial Recognition
+# Real-time Face Recognition
 
-## Oveview
-This Python script performs facial recognition tasks by detecting faces in an image, drawing bounding boxes around the detected faces, and identifying them by comparing them with a list of known faces.
+## Overview
+This Python script performs real-time face recognition using a webcam. It detects faces from the webcam feed, compares them with a reference image, and displays "Match" or "No Match" based on whether the detected face matches the face in the reference image.
 
 ## Features
-- Opens an image file and detects faces using OpenCV.
-- Draws bounding boxes around the detected faces.
-- Matches the detected faces with a predefined list of known faces.
-- Associates each detected face with its corresponding name.
+- Utilizes webcam feed for real-time face detection.
+- Compares the detected faces with a reference image.
+- Displays "Match" or "No Match" based on the comparison result.
