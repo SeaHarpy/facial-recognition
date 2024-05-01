@@ -1,34 +1,52 @@
 import cv2
-import matplotlib.pyplot as plt
+import threading
+from deepface import DeepFace
 
-class FaceDetector:
+# Define Camera
+capture = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 
-    __slots__ = ['name', 'face']
+# Define proportions
+capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
-    def __intit__(self, name: str, face: any) -> None:
-        self.name = name
-        self.face = face
+counter = 0
+face_match = False
 
-def main(args):
-    imagePath = 'test_image.jpg' # image path
-    img = cv2.imread(imagePath) # read image
+ref_img = cv2.imread("ref_img.jpg")
 
-    # img.shape = 3D array of (height, width, channel)
-    gray_imgage = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # remove channel
-        
-    face_classifier = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
-    
-    face = face_classifier.detectMultiScale(gray_imgage, scaleFactor=1.1, minNeighbors=5, minSize=(40,40))
+# Using DeepFace check if the faces are the same
+def check_face(frame):
+    global face_match
+    try:
+        if DeepFace.verify(frame, ref_img.copy())['verified']:
+            face_match = True
+        else:
+            face_match = False
+    except ValueError:
+        face_match = False
 
-    for (x, y, w, h) in face:
-        cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 4)
 
-    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+while True:
+    ret, frame = capture.read()
 
-    plt.figure(figsize=(20,10))
-    plt.imshow(img_rgb)
-    plt.axis('off')
-    plt.show()
+    if ret:
+        if counter % 30 == 0:
+            try: 
+                threading.Thread(target=check_face, args=(frame.copy(),)).start()
+            except ValueError:
+                pass
+        counter += 1
 
-if __name__ == "__main__":
-    main(None)
+        # If there is a match write the "Match" green otherwise write "No match" red
+        if face_match:
+            cv2.putText(frame, "Match", (20, 450), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 3)
+        else:
+            cv2.putText(frame, "No Match", (20, 450), cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 3)
+
+        cv2.imshow("video", frame)
+
+    key = cv2.waitKey(1)
+    if key == ord("q"):
+        break
+
+cv2.destroyAllWindows()
