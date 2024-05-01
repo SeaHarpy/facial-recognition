@@ -1,4 +1,4 @@
-# facial-recognition
+# Facial Recognition
 
 ## Oveview
 This Python script performs facial recognition tasks by detecting faces in an image, drawing bounding boxes around the detected faces, and identifying them by comparing them with a list of known faces.
